@@ -1,20 +1,21 @@
 package dev.ai4j.openai4j;
 
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.Buffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.StreamSupport.stream;
 
 class RequestLoggingInterceptor implements Interceptor {
 
@@ -104,10 +105,11 @@ class RequestLoggingInterceptor implements Interceptor {
     }
 
     static String inOneLine(Headers headers) {
-
-        return stream(headers.spliterator(), false)
-                .map(header -> format(header.component1(), header.component2()))
-                .collect(joining(", "));
+        return headers.toMultimap().entrySet().stream()
+            .map(header -> header.getValue().stream().map(value -> new AbstractMap.SimpleEntry<>(header.getKey(), value)))
+            .flatMap(header -> header)
+            .map(header -> format(header.getKey(), header.getValue()))
+            .collect(Collectors.joining(", "));
     }
 
     static String format(String headerKey, String headerValue) {

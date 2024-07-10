@@ -136,7 +136,7 @@ class StreamingRequestExecutor<Request, Response, ResponseContent> {
 
         okhttp3.Request okHttpRequest = new okhttp3.Request.Builder()
                 .url(endpointUrl)
-                .post(RequestBody.create(requestJson, MediaType.get("application/json; charset=utf-8")))
+                .post(RequestBody.create(MediaType.get("application/json; charset=utf-8"), requestJson))
                 .build();
 
         ResponseHandle responseHandle = new ResponseHandle();
